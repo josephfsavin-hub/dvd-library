@@ -1,417 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>My Netflix Style Movie Library</title>
-<style>
-  /* RESET */
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    background-color: #141414;
-    color: #eee;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
-  }
-  header {
-    background-color: #111;
-    padding: 1rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-  }
-  header h1 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.5rem;
-    letter-spacing: 2px;
-    color: #e50914; /* Netflix red */
-  }
-  #searchInput {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    width: 250px;
-    max-width: 60vw;
-  }
-  #content {
-    padding: 1rem 2rem 4rem;
-  }
-  .genre-section {
-    margin-bottom: 3rem;
-  }
-  .genre-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    padding-left: 0.25rem;
-  }
-  .movie-row {
-    display: flex;
-    overflow-x: auto;
-    gap: 0.75rem;
-    padding-bottom: 0.5rem;
-    scrollbar-width: thin;
-    scrollbar-color: #444 transparent;
-  }
-  .movie-row::-webkit-scrollbar {
-    height: 8px;
-  }
-  .movie-row::-webkit-scrollbar-thumb {
-    background-color: #444;
-    border-radius: 10px;
-  }
-  .movie-card {
-    min-width: 140px;
-    max-width: 140px;
-    cursor: pointer;
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 0 8px rgb(0 0 0 / 0.8);
-    transition: transform 0.2s ease;
-  }
-  .movie-card:hover {
-    transform: scale(1.12);
-    z-index: 2;
-  }
-  .movie-poster {
-    width: 100%;
-    height: 210px;
-    object-fit: cover;
-    display: block;
-    border-radius: 5px;
-  }
-  .movie-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin: 0.4rem 0 0.2rem 0;
-    padding: 0 0.25rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  /* Modal styles */
-  #modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(20,20,20,0.95);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
-  }
-  #modal.active {
-    display: flex;
-  }
-  #modal-content {
-    background-color: #222;
-    max-width: 900px;
-    width: 90%;
-    max-height: 90vh;
-    border-radius: 8px;
-    overflow-y: auto;
-    box-shadow: 0 0 15px #e50914aa;
-    padding: 1rem 1.5rem 2rem;
-    color: #eee;
-    position: relative;
-  }
-  #modal-close {
-    position: absolute;
-    top: 12px;
-    right: 15px;
-    font-size: 1.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    color: #e50914;
-  }
-  #modal-content h2 {
-    margin-top: 0;
-  }
-  #modal-poster {
-    float: left;
-    width: 140px;
-    border-radius: 5px;
-    margin-right: 1rem;
-    box-shadow: 0 0 10px #e50914bb;
-  }
-  #modal-details {
-    overflow: hidden;
-  }
-  #modal-description {
-    margin-top: 1rem;
-    line-height: 1.4;
-  }
-  #modal-trailer {
-    margin-top: 1.5rem;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: none;
-    border-radius: 6px;
-    box-shadow: 0 0 10px #e50914bb;
-  }
-  /* Responsive */
-  @media (max-width: 600px) {
-    #modal-content {
-      max-width: 100%;
-      padding: 1rem;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Showcase</title>
+
+  <!-- Link to CSS stylesheet (placeholder) -->
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+
+  <!-- Link to Movie and MovieCollection classes -->
+  <script src="Movie.js"></script>
+  <script src="MovieCollection.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-    #modal-poster {
-      float: none;
-      display: block;
-      margin: 0 auto 1rem;
-      width: 80vw;
-      max-width: 300px;
+    nav {
+      margin-bottom: 20px;
     }
-  }
-</style>
+    .section {
+      margin-bottom: 40px;
+    }
+    .section h2 {
+      margin-bottom: 10px;
+    }
+    .movie-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .movie-card {
+      width: 150px;
+      text-align: center;
+    }
+    .movie-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>My Movie Library</h1>
-  <input type="search" id="searchInput" placeholder="Search movies..." />
-</header>
-<main id="content">
-  <!-- Genre sections will be inserted here dynamically -->
-</main>
 
-<!-- Modal for movie details -->
-<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div id="modal-content">
-    <span id="modal-close" title="Close modal">&times;</span>
-    <h2 id="modalTitle"></h2>
-    <div id="modal-details">
-      <img id="modal-poster" src="" alt="Movie Poster" />
-      <p><strong>Year:</strong> <span id="modal-year"></span></p>
-      <p><strong>Genres:</strong> <span id="modal-genres"></span></p>
-      <p><strong>Description:</strong></p>
-      <p id="modal-description"></p>
-      <iframe
-        id="modal-trailer"
-        src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        title="Movie Trailer"
-      ></iframe>
-    </div>
+  <!-- Navigation -->
+  <nav>
+    <a href="secondpage.html">Go to Second Page</a>
+  </nav>
+
+  <!-- Movie Sections -->
+  <div class="section" id="foryou">
+    <h2>For You</h2>
+    <div class="movie-grid" id="foryou-grid"></div>
   </div>
-</div>
 
-<script>
-  // Sample movie data (10 movies)
-  const movies = [
-    {
-      title: "Inception",
-      genres: ["Action", "Sci-Fi", "Thriller"],
-      year: 2010,
-      description: "A thief who steals corporate secrets through the use of dream-sharing technology...",
-      poster: "https://image.tmdb.org/t/p/w300/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
-      trailer: "https://www.youtube.com/embed/8hP9D6kZseM"
-    },
-    {
-      title: "The Godfather",
-      genres: ["Crime", "Drama"],
-      year: 1972,
-      description: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
-      poster: "https://image.tmdb.org/t/p/w300/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
-      trailer: "https://www.youtube.com/embed/sY1S34973zA"
-    },
-    {
-      title: "Pulp Fiction",
-      genres: ["Crime", "Drama"],
-      year: 1994,
-      description: "The lives of two mob hitmen, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
-      poster: "https://image.tmdb.org/t/p/w300/dM2w364MScsjFf8pfMbaWUcWrR.jpg",
-      trailer: "https://www.youtube.com/embed/s7EdQ4FqbhY"
-    },
-    {
-      title: "The Dark Knight",
-      genres: ["Action", "Crime", "Drama"],
-      year: 2008,
-      description: "When the menace known as the Joker wreaks havoc and chaos on Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-      poster: "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-      trailer: "https://www.youtube.com/embed/EXeTwQWrcwY"
-    },
-    {
-      title: "Forrest Gump",
-      genres: ["Drama", "Romance"],
-      year: 1994,
-      description: "The presidencies of Kennedy and Johnson, Vietnam, Watergate, and other history unfold through the perspective of an Alabama man with an IQ of 75.",
-      poster: "https://image.tmdb.org/t/p/w300/saHP97rTPS5eLmrLQEcANmKrsFl.jpg",
-      trailer: "https://www.youtube.com/embed/bLvqoHBptjg"
-    },
-    {
-      title: "Fight Club",
-      genres: ["Drama"],
-      year: 1999,
-      description: "An insomniac office worker and a devil-may-care soap maker form an underground fight club.",
-      poster: "https://image.tmdb.org/t/p/w300/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg",
-      trailer: "https://www.youtube.com/embed/SUXWAEX2jlg"
-    },
-    {
-      title: "Interstellar",
-      genres: ["Adventure", "Drama", "Sci-Fi"],
-      year: 2014,
-      description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
-      poster: "https://image.tmdb.org/t/p/w300/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-      trailer: "https://www.youtube.com/embed/zSWdZVtXT7E"
-    },
-    {
-      title: "The Matrix",
-      genres: ["Action", "Sci-Fi"],
-      year: 1999,
-      description: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
-      poster: "https://image.tmdb.org/t/p/w300/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-      trailer: "https://www.youtube.com/embed/vKQi3bBA1y8"
-    },
-    {
-      title: "Gladiator",
-      genres: ["Action", "Adventure", "Drama"],
-      year: 2000,
-      description: "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family.",
-      poster: "https://image.tmdb.org/t/p/w300/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg",
-      trailer: "https://www.youtube.com/embed/owK1qxDselE"
-    },
-    {
-      title: "The Shawshank Redemption",
-      genres: ["Drama", "Crime"],
-      year: 1994,
-      description: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-      poster: "https://image.tmdb.org/t/p/w300/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
-      trailer: "https://www.youtube.com/embed/6hB3S9bIaco"
-    }
-  ];
+  <div class="section" id="crime">
+    <h2>Crime</h2>
+    <div class="movie-grid" id="crime-grid"></div>
+  </div>
 
-  const contentEl = document.getElementById('content');
-  const searchInput = document.getElementById('searchInput');
-  const modal = document.getElementById('modal');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalPoster = document.getElementById('modal-poster');
-  const modalYear = document.getElementById('modal-year');
-  const modalGenres = document.getElementById('modal-genres');
-  const modalDescription = document.getElementById('modal-description');
-  const modalTrailer = document.getElementById('modal-trailer');
-  const modalClose = document.getElementById('modal-close');
+  <div class="section" id="comedy">
+    <h2>Comedy</h2>
+    <div class="movie-grid" id="comedy-grid"></div>
+  </div>
 
-  // Group movies by genre
-  function groupByGenre(movies) {
-    const genreMap = {};
-    movies.forEach(movie => {
-      movie.genres.forEach(g => {
-        if (!genreMap[g]) genreMap[g] = [];
-        genreMap[g].push(movie);
-      });
-    });
-    return genreMap;
-  }
+  <!-- Main Script -->
+  <script>
+    const collection = new MovieCollection();
 
-  // Render all movies grouped by genre
-  function renderMovies(movies) {
-    contentEl.innerHTML = '';
-    const grouped = groupByGenre(movies);
-    if (movies.length === 0) {
-      contentEl.innerHTML = '<p style="padding:1rem; font-size:1.2rem;">No movies found.</p>';
-      return;
-    }
-    Object.entries(grouped).forEach(([genre, movies]) => {
-      const section = document.createElement('section');
-      section.classList.add('genre-section');
+    // Put your actual published Google Sheets CSV link here
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/your_sheet_id/pub?output=csv';
 
-      const title = document.createElement('h2');
-      title.className = 'genre-title';
-      title.textContent = genre;
-      section.appendChild(title);
+    collection.loadFromGoogleSheetCSV(csvUrl).then(() => {
+      const forYou = document.getElementById('foryou-grid');
+      const crime = document.getElementById('crime-grid');
+      const comedy = document.getElementById('comedy-grid');
 
-      const row = document.createElement('div');
-      row.className = 'movie-row';
-
-      movies.forEach(movie => {
+      collection.movies.forEach(movie => {
         const card = document.createElement('div');
-        card.className = 'movie-card';
-        card.setAttribute('tabindex', 0);
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-pressed', 'false');
+        card.classList.add('movie-card');
+        card.innerHTML = `
+          <img src="${movie.posterUrl}" alt="${movie.title} poster">
+          <p>${movie.title}</p>
+        `;
 
-        card.addEventListener('click', () => showModal(movie));
-        card.addEventListener('keypress', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            showModal(movie);
-          }
-        });
-
-        const img = document.createElement('img');
-        img.className = 'movie-poster';
-        img.src = movie.poster;
-        img.alt = `Poster of ${movie.title}`;
-
-        const titleEl = document.createElement('p');
-        titleEl.className = 'movie-title';
-        titleEl.textContent = movie.title;
-
-        card.appendChild(img);
-        card.appendChild(titleEl);
-        row.appendChild(card);
+        const genreLower = movie.genres.toLowerCase();
+        if (genreLower.includes('crime')) {
+          crime.appendChild(card);
+        } else if (genreLower.includes('comedy')) {
+          comedy.appendChild(card);
+        } else {
+          forYou.appendChild(card);
+        }
       });
-
-      section.appendChild(row);
-      contentEl.appendChild(section);
     });
-  }
-
-  // Show modal with movie details
-  function showModal(movie) {
-    modalTitle.textContent = movie.title;
-    modalPoster.src = movie.poster;
-    modalPoster.alt = `Poster of ${movie.title}`;
-    modalYear.textContent = movie.year;
-    modalGenres.textContent = movie.genres.join(', ');
-    modalDescription.textContent = movie.description;
-    modalTrailer.src = movie.trailer + "?autoplay=1&rel=0";
-
-    modal.classList.add('active');
-    modalClose.focus();
-  }
-
-  // Close modal and stop trailer
-  function closeModal() {
-    modal.classList.remove('active');
-    modalTrailer.src = "";
-  }
-
-  modalClose.addEventListener('click', closeModal);
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  // Search functionality
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase().trim();
-    if (!query) {
-      renderMovies(movies);
-      return;
-    }
-    const filtered = movies.filter(m => m.title.toLowerCase().includes(query) ||
-      m.genres.some(g => g.toLowerCase().includes(query)) ||
-      m.description.toLowerCase().includes(query));
-    renderMovies(filtered);
-  });
-
-  // Initial render
-  renderMovies(movies);
-</script>
+  </script>
 </body>
 </html>
