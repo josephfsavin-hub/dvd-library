@@ -332,7 +332,7 @@ function getRecentlyWatched(n=5) {
 
     // Recommend movies matching any of these but NOT already watched
     return movies.filter(m => {
-      if (m.Watched_Yes_No.toLowerCase() === 'yes') return false;
+if ((m.Watched_Yes_No || '').toLowerCase() === 'yes') return false;
       const movieGenres = m.Genre_s ? m.Genre_s.split(',').map(x => x.trim()) : [];
       const movieDirectors = m.Director_s ? m.Director_s.split(',').map(x => x.trim()) : [];
       const movieActors = m.Main_Actor_s ? m.Main_Actor_s.split(',').map(x => x.trim()) : [];
