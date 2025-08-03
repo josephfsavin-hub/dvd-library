@@ -3,537 +3,209 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>My DVD Library</title>
+<title>My DVD Collection (Debug Mode)</title>
 <style>
-  /* Basic reset & styling */
+  /* Same styling as before */
   body {
-    margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background: #121212; color: #eee;
+    margin: 0; font-family: Arial, sans-serif; background: #111; color: #eee;
     transition: background 0.3s, color 0.3s;
   }
+  .dark-mode {
+    background: #222; color: #eee;
+  }
   header {
-    padding: 1rem 2rem; background: #1f1f1f; display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap;
-  }
-  header h1 {
-    margin: 0; font-weight: 700;
-  }
-  .controls {
-    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
-  }
-  input[type=search] {
-    padding: 0.4rem 0.6rem; font-size: 1rem; border-radius: 4px; border: none;
-    max-width: 250px;
-  }
-  button {
-    background: #3a3a3a; border: none; padding: 0.5rem 1rem; border-radius: 4px; color: #eee;
-    cursor: pointer; font-weight: 600;
-  }
-  button:hover {
-    background: #555;
-  }
-  main {
-    padding: 1rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto 3rem;
-  }
-  .row-title {
-    margin: 1.5rem 0 0.5rem; font-size: 1.4rem; font-weight: 700;
-  }
-  .carousel {
-    display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem;
-    scroll-behavior: smooth;
-  }
-  .carousel::-webkit-scrollbar {
-    height: 8px;
-  }
-  .carousel::-webkit-scrollbar-thumb {
-    background: #555; border-radius: 4px;
-  }
-  .movie-card {
-    flex: 0 0 auto; width: 150px; cursor: pointer;
-    background: #222; border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.8);
-    position: relative;
-    transition: transform 0.15s ease-in-out;
-  }
-  .movie-card:hover {
-    transform: scale(1.05);
-    z-index: 5;
-  }
-  .movie-poster {
-    width: 100%; height: 225px; border-radius: 6px 6px 0 0;
-    object-fit: cover;
-    background: #333;
-  }
-  .movie-info {
-    padding: 0.4rem 0.5rem;
-    font-size: 0.85rem;
-    line-height: 1.1;
-  }
-  .movie-title {
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .movie-year {
-    color: #bbb;
-  }
-  .icon-row {
-    position: absolute;
-    top: 6px; right: 6px;
-    display: flex; gap: 6px;
-  }
-  .icon {
-    width: 18px; height: 18px;
-    opacity: 0.75;
-  }
-  .icon.liked {
-    filter: drop-shadow(0 0 1px #f39c12);
-  }
-  .icon.watched {
-    filter: drop-shadow(0 0 1px #27ae60);
-  }
-  /* Expanded details modal */
-  .modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.85);
-    display: flex; justify-content: center; align-items: center;
-    padding: 1rem;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    z-index: 1000;
-  }
-  .modal.active {
-    visibility: visible;
-    opacity: 1;
-  }
-  .modal-content {
+    padding: 1em;
     background: #222;
-    border-radius: 8px;
-    max-width: 700px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 1rem 1.25rem;
-    position: relative;
-    color: #eee;
+    display: flex; align-items: center; gap: 1em;
   }
-  .modal-close {
-    position: absolute;
-    top: 12px; right: 12px;
-    background: transparent;
-    border: none;
-    color: #eee;
-    font-size: 1.5rem;
-    cursor: pointer;
+  header input[type=search] {
+    flex-grow: 1; padding: 0.5em; font-size: 1em; border-radius: 4px; border: none;
   }
-  .modal h2 {
-    margin-top: 0;
-  }
-  .modal p {
-    line-height: 1.4;
-  }
-  .modal-details {
-    font-size: 0.9rem;
-    color: #ccc;
-    margin: 0.6rem 0 1rem;
-  }
-  .modal-trailer {
-    width: 100%;
-    aspect-ratio: 16/9;
-    border: none;
-    border-radius: 6px;
-    margin-top: 1rem;
-  }
-  /* Dark mode toggle */
-  .dark-toggle {
-    display: flex; align-items: center; gap: 0.4rem;
-    font-size: 0.9rem;
+  header label {
     cursor: pointer;
     user-select: none;
   }
-  /* Responsive */
-  @media (max-width: 700px) {
-    .movie-card {
-      width: 120px;
-      height: auto;
-    }
-    .movie-poster {
-      height: 180px;
-    }
+  header label input[type=checkbox] {
+    margin-right: 0.5em;
+  }
+  h2 {
+    margin-left: 1em; font-weight: normal;
+  }
+  .row {
+    margin: 1em 0 2em 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-left: 1em;
+  }
+  .movie {
+    display: inline-block;
+    width: 140px;
+    margin-right: 0.5em;
+    vertical-align: top;
+    cursor: pointer;
+    position: relative;
+  }
+  .movie img {
+    width: 140px;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  }
+  .movie-title {
+    margin-top: 0.25em;
+    font-size: 0.9em;
+    white-space: normal;
+    height: 2.6em;
+    overflow: hidden;
+  }
+  .icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+  }
+  .icon.watched {
+    filter: hue-rotate(90deg);
+  }
+  .icon.liked {
+    filter: hue-rotate(300deg);
+    right: 30px;
+  }
+  #modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 2em;
+    box-sizing: border-box;
+  }
+  #modal.show {
+    display: flex;
+  }
+  #modal-content {
+    background: #222;
+    border-radius: 10px;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1em 1.5em;
+    color: #eee;
+    box-sizing: border-box;
+  }
+  #modal-close {
+    float: right;
+    font-size: 1.5em;
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+  }
+  #modal img {
+    float: left;
+    margin-right: 1em;
+    width: 150px;
+    height: 225px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.9);
+  }
+  #modal h3 {
+    margin-top: 0;
+  }
+  #modal .info {
+    font-size: 0.9em;
+    margin-top: 0.5em;
+    clear: both;
+  }
+  #modal iframe {
+    width: 100%;
+    height: 315px;
+    margin-top: 1em;
+    border: none;
+    border-radius: 6px;
+  }
+  .row::-webkit-scrollbar {
+    height: 8px;
+  }
+  .row::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>My DVD Library</h1>
-  <div class="controls">
-    <input type="search" id="searchInput" placeholder="Search movies, actors, directors..." aria-label="Search movies"/>
-    <button id="randomPickBtn" title="Pick a random movie or show">🎲 Random Pick</button>
-    <label class="dark-toggle">
-      <input type="checkbox" id="darkModeToggle" />
-      Dark Mode
-    </label>
-  </div>
+  <input id="searchInput" type="search" placeholder="Search by title, director, actor..." />
+  <label><input type="checkbox" id="darkModeToggle" /> Dark Mode</label>
 </header>
 
 <main id="content">
-  <p>Loading your collection…</p>
+  <p>Loading your collection...</p>
 </main>
 
-<div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-  <div class="modal-content" role="document">
-    <button aria-label="Close details" class="modal-close">&times;</button>
-    <h2 id="modalTitle"></h2>
+<div id="modal" aria-hidden="true">
+  <div id="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <span id="modal-close" tabindex="0" role="button" aria-label="Close modal">&times;</span>
+    <h3 id="modalTitle"></h3>
+    <img id="modalPoster" alt="Movie poster" />
+    <div class="info" id="modalInfo"></div>
     <p id="modalDescription"></p>
-    <p class="modal-details" id="modalDetails"></p>
-    <iframe id="modalTrailer" class="modal-trailer" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+    <iframe id="modalTrailer" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
   </div>
 </div>
 
 <script>
-(async function() {
-  // YOUR GOOGLE SHEET SETTINGS
-  // Replace this with your sheet's published CSV link
-  const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv';
-  // NOTE: I converted your shared Google Sheet into a published CSV link for this demo.
-  // You will need to Publish your Google Sheet as CSV via File > Publish to Web > CSV > Sheet1
-  // and then replace the link above.
+(async function(){
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv';
 
   const content = document.getElementById('content');
   const searchInput = document.getElementById('searchInput');
-  const randomPickBtn = document.getElementById('randomPickBtn');
   const darkModeToggle = document.getElementById('darkModeToggle');
   const modal = document.getElementById('modal');
+  const modalClose = document.getElementById('modal-close');
   const modalTitle = document.getElementById('modalTitle');
+  const modalPoster = document.getElementById('modalPoster');
+  const modalInfo = document.getElementById('modalInfo');
   const modalDescription = document.getElementById('modalDescription');
-  const modalDetails = document.getElementById('modalDetails');
   const modalTrailer = document.getElementById('modalTrailer');
-  const modalCloseBtn = modal.querySelector('.modal-close');
 
   let movies = [];
   let filteredMovies = [];
-  let lastShuffleDate = localStorage.getItem('lastShuffleDate') || null;
-  let shuffledMovies = [];
 
-  // Helper: parse CSV to array of objects
-  function csvToObjects(csv) {
+  console.log('Starting to fetch CSV from:', CSV_URL);
+
+  // CSV Parsing helper
+  function csvToObjects(csv){
+    console.log('Parsing CSV text...');
     const lines = csv.trim().split('\n');
-    const headers = lines.shift().split(',');
-    return lines.map(line => {
-      const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = values[i] || '');
+    console.log(`Total lines in CSV: ${lines.length}`);
+    const headers = lines.shift().split(',').map(h => h.trim());
+    console.log('Parsed headers:', headers);
+    return lines.map((line,i) => {
+      const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+      if(values.length !== headers.length){
+        console.warn(`Line ${i+2} values length (${values.length}) does not match headers length (${headers.length})`);
+      }
+      const obj = {};
+      headers.forEach((h,i) => {
+        let v = values[i] || '';
+        if(v.startsWith('"') && v.endsWith('"')) v = v.slice(1,-1);
+        obj[h] = v.trim();
+      });
       return obj;
     });
   }
 
-  // Fetch CSV from Google Sheet
-  async function fetchMovies() {
-    const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv');
-    const text = await res.text();
-    return csvToObjects(text);
-  }
-
-  // Shuffle array helper
-  function shuffleArray(arr) {
-    let a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  // Check if 24 hours passed since last shuffle
-  function needsShuffle() {
-    if (!lastShuffleDate) return true;
-    const last = new Date(lastShuffleDate);
-    const now = new Date();
-    return (now - last) > 24 * 60 * 60 * 1000;
-  }
-
-  // Save shuffle date
-  function saveShuffleDate() {
-    localStorage.setItem('lastShuffleDate', new Date().toISOString());
-  }
-
-  // Filter movies by search and filters
-  function filterMovies(query) {
-    query = query.trim().toLowerCase();
-    if (!query) return movies;
-
-    return movies.filter(m => {
-      // search title, director, actors, genre, description, collection title
-      const haystack = [
-        m.Title, m.Director_s, m.Main_Actor_s, m.Supporting_Actor_s,
-        m.Genre_s, m.Description, m.DVD_Collection_Title, m.Writer_s
-      ].join(' ').toLowerCase();
-
-      return haystack.includes(query);
-    });
-  }
-
-  // Group movies by genre (returns an object genre -> array of movies)
-  function groupByGenre(movieList) {
-    let groups = {};
-    movieList.forEach(m => {
-      if (!m['Genre(s)']) return;
-m['Genre(s)'].split(',').map(g => g.trim()).forEach(genre => {
-  if (!groups[genre]) groups[genre] = [];
-  groups[genre].push(m);
-});
-    });
-    return groups;
-  }
-
-  // Get recently watched movies (watched=yes, sort by Last Watched desc)
-function getRecentlyWatched(n=5) {
-  return movies.filter(m => {
-    if (!m || !m.Watched_Yes_No) {
-      console.warn('Missing Watched_Yes_No:', m);
-      return false;
-    }
-    // Safe check for Watched_Yes_No
-    if ((m.Watched_Yes_No || '').toLowerCase() !== 'yes') return false;
-
-    // Add any other .toLowerCase() property checks here if you have them in filter
-    
-    return true;
-  })
-  .sort((a,b) => {
-    let da = new Date(a.Last_Watched || 0);
-    let db = new Date(b.Last_Watched || 0);
-    return db - da;
-  })
-  .slice(0,n);
-}
-
-  // Recommend movies based on genres, directors, actors in recent watches
-  function getRecommendations() {
-    const recent = getRecentlyWatched();
-    if (!recent.length) return [];
-
-    let genres = new Set();
-    let directors = new Set();
-    let actors = new Set();
-
-    recent.forEach(m => {
-      if(m.Genre_s) m.Genre_s.split(',').forEach(g => genres.add(g.trim()));
-      if(m.Director_s) m.Director_s.split(',').forEach(d => directors.add(d.trim()));
-      if(m.Main_Actor_s) m.Main_Actor_s.split(',').forEach(a => actors.add(a.trim()));
-    });
-
-    // Recommend movies matching any of these but NOT already watched
-    return movies.filter(m => {
-if ((m.Watched_Yes_No || '').toLowerCase() === 'yes') return false;
-      const movieGenres = m.Genre_s ? m.Genre_s.split(',').map(x => x.trim()) : [];
-      const movieDirectors = m.Director_s ? m.Director_s.split(',').map(x => x.trim()) : [];
-      const movieActors = m.Main_Actor_s ? m.Main_Actor_s.split(',').map(x => x.trim()) : [];
-
-      return movieGenres.some(g => genres.has(g)) ||
-             movieDirectors.some(d => directors.has(d)) ||
-             movieActors.some(a => actors.has(a));
-    });
-  }
-
-  // Create a movie card DOM element
-  function createMovieCard(movie) {
-    const card = document.createElement('div');
-    card.className = 'movie-card';
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `View details for ${movie.Title}`);
-
-    const poster = document.createElement('img');
-    poster.className = 'movie-poster';
-    poster.alt = `Cover art for ${movie.Title}`;
-    poster.src = movie.Box_Art_Image_URL || '';
-    poster.onerror = () => poster.src = 'https://via.placeholder.com/150x225?text=No+Image';
-
-    const info = document.createElement('div');
-    info.className = 'movie-info';
-
-    const title = document.createElement('div');
-    title.className = 'movie-title';
-    title.textContent = movie.Title;
-
-    const year = document.createElement('div');
-    year.className = 'movie-year';
-    year.textContent = movie.Year || '';
-
-    const iconRow = document.createElement('div');
-    iconRow.className = 'icon-row';
-
-    if (movie.Liked_Yes_No && movie.Liked_Yes_No.toLowerCase() === 'yes') {
-      const likedIcon = document.createElement('span');
-      likedIcon.innerHTML = '⭐';
-      likedIcon.title = 'Liked';
-      likedIcon.className = 'icon liked';
-      iconRow.appendChild(likedIcon);
-    }
-    if (movie.Watched_Yes_No && movie.Watched_Yes_No.toLowerCase() === 'yes') {
-      const watchedIcon = document.createElement('span');
-      watchedIcon.innerHTML = '✔️';
-      watchedIcon.title = 'Watched';
-      watchedIcon.className = 'icon watched';
-      iconRow.appendChild(watchedIcon);
-    }
-
-    info.appendChild(title);
-    info.appendChild(year);
-
-    card.appendChild(poster);
-    card.appendChild(iconRow);
-    card.appendChild(info);
-
-    // Click expands modal with details
-    card.addEventListener('click', () => showModal(movie));
-    card.addEventListener('keypress', (e) => { if(e.key === 'Enter') showModal(movie); });
-
-    return card;
-  }
-
-  // Render a carousel row of movies
-  function renderCarouselRow(title, movieList) {
-    if (!movieList.length) return '';
-
-    const container = document.createElement('section');
-    const rowTitle = document.createElement('h2');
-    rowTitle.className = 'row-title';
-    rowTitle.textContent = title;
-    container.appendChild(rowTitle);
-
-    const carousel = document.createElement('div');
-    carousel.className = 'carousel';
-
-    movieList.forEach(movie => {
-      carousel.appendChild(createMovieCard(movie));
-    });
-
-    container.appendChild(carousel);
-    return container;
-  }
-
-  // Show modal with movie details
-  function showModal(movie) {
-    modalTitle.textContent = movie.Title;
-    modalDescription.textContent = movie.Description || 'No description available.';
-    modalDetails.textContent = `
-      Year: ${movie.Year || 'Unknown'} | Runtime: ${movie['Runtime (min)'] || 'N/A'} min
-      ${movie.Director_s ? '| Director(s): ' + movie.Director_s : ''}
-      ${movie.Main_Actor_s ? '| Actors: ' + movie.Main_Actor_s : ''}
-      ${movie.DVD_Collection_Title ? '| DVD Collection: ' + movie.DVD_Collection_Title : ''}
-    `.replace(/\| $/, '').trim();
-
-    if (movie['YouTube Trailer URL']) {
-      // Extract embed link from YouTube URL
-      const url = movie['YouTube Trailer URL'];
-      let videoId = null;
-      // Supports youtu.be and youtube.com URLs
-      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/);
-      if (ytMatch) videoId = ytMatch[1];
-      if (videoId) {
-        modalTrailer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-        modalTrailer.style.display = 'block';
-      } else {
-        modalTrailer.style.display = 'none';
-      }
-    } else {
-      modalTrailer.style.display = 'none';
-      modalTrailer.src = '';
-    }
-
-    modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
-  }
-
-  // Close modal
-  modalCloseBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    modalTrailer.src = '';
-  });
-
-  // Close modal on background click
-  modal.addEventListener('click', e => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-      modal.setAttribute('aria-hidden', 'true');
-      modalTrailer.src = '';
-    }
-  });
-
-  // Dark mode toggle
-  darkModeToggle.addEventListener('change', e => {
-    if (e.target.checked) {
-      document.body.style.background = '#121212';
-      document.body.style.color = '#eee';
-    } else {
-      document.body.style.background = '#f5f5f5';
-      document.body.style.color = '#222';
-    }
-  });
-
-  // Random pick button
-  randomPickBtn.addEventListener('click', () => {
-    if (!movies.length) return;
-    const available = movies.filter(m => m.Watched_Yes_No?.toLowerCase() !== 'yes');
-    const pickPool = available.length ? available : movies;
-    const pick = pickPool[Math.floor(Math.random() * pickPool.length)];
-    showModal(pick);
-  });
-
-  // Search input handler
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value;
-    filteredMovies = filterMovies(q);
-    renderAllRows(filteredMovies);
-  });
-
-  // Render all rows with optional filtered movies
-  function renderAllRows(data) {
-    content.innerHTML = '';
-
-    // Recommended row
-    const recommended = getRecommendations();
-    if (recommended.length) content.appendChild(renderCarouselRow('Recommended For You', recommended));
-
-    // Group by genre and render shuffled rows
-    const grouped = groupByGenre(data);
-    const genres = Object.keys(grouped).sort();
-
-    genres.forEach(genre => {
-      // Shuffle order of movies within genre daily
-      let moviesForGenre = grouped[genre].slice();
-      if (needsShuffle()) {
-        moviesForGenre = shuffleArray(moviesForGenre);
-      }
-      content.appendChild(renderCarouselRow(genre, moviesForGenre));
-    });
-
-    // ALL movies row alphabetical
-    const allRowMovies = data.slice().sort((a,b) => a.Title.localeCompare(b.Title));
-    content.appendChild(renderCarouselRow('All Movies & Shows', allRowMovies));
-
-    // Save shuffle date
-    if (needsShuffle()) saveShuffleDate();
-  }
-
-  // Main init
-  try {
-    movies = await fetchMovies();
-    console.log("Fetched CSV text:", await fetchMovies());
-
-
-    // Normalize keys to safe JS property names by replacing spaces and parentheses with underscores
-    movies = movies.map(m => {
+  // Normalize keys to safe property names (replace spaces, parentheses)
+  function normalizeKeys(movies) {
+    console.log('Normalizing keys...');
+    return movies.map(m => {
       const norm = {};
       Object.entries(m).forEach(([k,v]) => {
         const key = k.trim().replace(/[ ()]/g,'_');
@@ -541,14 +213,238 @@ if ((m.Watched_Yes_No || '').toLowerCase() === 'yes') return false;
       });
       return norm;
     });
-
-    filteredMovies = movies.slice();
-    renderAllRows(filteredMovies);
-
-  } catch (e) {
-    content.innerHTML = `<p>Failed to load your collection. Check your Google Sheet settings and link.</p>`;
-    console.error(e);
   }
+
+  function groupByGenre(movieList){
+    const groups = {};
+    movieList.forEach(m => {
+      if(!m.Genre_s) {
+        console.warn('Movie missing Genre(s):', m.Title || m);
+        return;
+      }
+      m.Genre_s.split(',').map(g=>g.trim()).forEach(genre=>{
+        if(!groups[genre]) groups[genre] = [];
+        groups[genre].push(m);
+      });
+    });
+    return groups;
+  }
+
+  function getRecentlyWatched(n=5){
+    console.log('Filtering recently watched movies...');
+    const filtered = movies.filter(m => {
+      if(!m.Watched_Yes_No){
+        console.warn('Movie missing Watched_Yes_No:', m.Title || m);
+        return false;
+      }
+      return m.Watched_Yes_No.toLowerCase() === 'yes';
+    });
+    filtered.sort((a,b) => {
+      const da = new Date(a.Last_Watched || 0);
+      const db = new Date(b.Last_Watched || 0);
+      return db - da;
+    });
+    console.log(`Found ${filtered.length} recently watched movies.`);
+    return filtered.slice(0,n);
+  }
+
+  function getRecommendations(){
+    console.log('Getting recommendations...');
+    const recent = getRecentlyWatched();
+    if(!recent.length){
+      console.log('No recent watches, skipping recommendations.');
+      return [];
+    }
+    const genres = new Set();
+    const directors = new Set();
+    const actors = new Set();
+
+    recent.forEach(m=>{
+      if(m.Genre_s) m.Genre_s.split(',').forEach(g=>genres.add(g.trim()));
+      if(m.Director_s) m.Director_s.split(',').forEach(d=>directors.add(d.trim()));
+      if(m.Main_Actor_s) m.Main_Actor_s.split(',').forEach(a=>actors.add(a.trim()));
+    });
+
+    const recommended = movies.filter(m=>{
+      if((m.Watched_Yes_No || '').toLowerCase() === 'yes') return false;
+      const movieGenres = m.Genre_s ? m.Genre_s.split(',').map(x=>x.trim()) : [];
+      const movieDirectors = m.Director_s ? m.Director_s.split(',').map(x=>x.trim()) : [];
+      const movieActors = m.Main_Actor_s ? m.Main_Actor_s.split(',').map(x=>x.trim()) : [];
+      return movieGenres.some(g=>genres.has(g)) ||
+             movieDirectors.some(d=>directors.has(d)) ||
+             movieActors.some(a=>actors.has(a));
+    });
+    console.log(`Recommended ${recommended.length} movies.`);
+    return recommended;
+  }
+
+  function sortByTitle(arr){
+    return arr.slice().sort((a,b)=>{
+      const aT = (a.Title || '').toLowerCase();
+      const bT = (b.Title || '').toLowerCase();
+      return aT.localeCompare(bT);
+    });
+  }
+
+  function renderRow(title, movies){
+    console.log(`Rendering row: ${title} (${movies.length} movies)`);
+    if(!movies.length) return null;
+    const container = document.createElement('section');
+    container.classList.add('row');
+    const h2 = document.createElement('h2');
+    h2.textContent = title;
+    container.appendChild(h2);
+    movies.forEach(m=>{
+      const div = document.createElement('div');
+      div.className = 'movie';
+      div.tabIndex = 0;
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-label', `Details for ${m.Title || 'Untitled'}`);
+      div.addEventListener('click', ()=>openModal(m));
+      div.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') { openModal(m); e.preventDefault(); } });
+
+      const img = document.createElement('img');
+      img.src = m.Poster || 'https://via.placeholder.com/140x210?text=No+Image';
+      img.alt = m.Title || 'Untitled';
+
+      div.appendChild(img);
+
+      if((m.Watched_Yes_No || '').toLowerCase() === 'yes'){
+        const wIcon = document.createElement('span');
+        wIcon.textContent = '✓';
+        wIcon.title = 'Watched';
+        wIcon.className = 'icon watched';
+        wIcon.style.position = 'absolute';
+        wIcon.style.top = '6px';
+        wIcon.style.right = '6px';
+        wIcon.style.color = 'limegreen';
+        div.appendChild(wIcon);
+      }
+
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'movie-title';
+      titleDiv.textContent = m.Title || 'Untitled';
+      div.appendChild(titleDiv);
+
+      container.appendChild(div);
+    });
+    return container;
+  }
+
+  function openModal(m){
+    console.log('Opening modal for:', m.Title || m);
+    modalTitle.textContent = m.Title || 'Untitled';
+    modalPoster.src = m.Poster || 'https://via.placeholder.com/150x225?text=No+Image';
+    modalDescription.textContent = m.Description || '';
+    modalInfo.innerHTML = `
+      <strong>Genre(s):</strong> ${m.Genre_s || 'N/A'}<br/>
+      <strong>Director(s):</strong> ${m.Director_s || 'N/A'}<br/>
+      <strong>Main Actor(s):</strong> ${m.Main_Actor_s || 'N/A'}<br/>
+      <strong>Type:</strong> ${m.Type || 'N/A'}<br/>
+      <strong>DVD Title:</strong> ${m.DVD_Collection_Title || 'N/A'}<br/>
+      <strong>Last Watched:</strong> ${m.Last_Watched || 'N/A'}
+    `;
+
+    if(m.Trailer){
+      console.log('Loading trailer:', m.Trailer);
+      let trailerSrc = '';
+      const idMatch = m.Trailer.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
+      if(idMatch){
+        trailerSrc = `https://www.youtube-nocookie.com/embed/${idMatch[1]}?autoplay=1&modestbranding=1`;
+      } else if(m.Trailer.includes('youtube.com') || m.Trailer.includes('youtu.be')){
+        trailerSrc = m.Trailer;
+      }
+      modalTrailer.src = trailerSrc;
+      modalTrailer.style.display = 'block';
+    } else {
+      modalTrailer.src = '';
+      modalTrailer.style.display = 'none';
+    }
+
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    modalClose.focus();
+  }
+
+  function closeModal(){
+    console.log('Closing modal');
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    modalTrailer.src = '';
+  }
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+  });
+
+  function renderAll(){
+    console.log('Rendering all rows...');
+    content.innerHTML = '';
+    const searched = searchInput.value.trim().toLowerCase();
+    filteredMovies = movies.filter(m=>{
+      if(!searched) return true;
+      return ['Title','Director_s','Main_Actor_s','Genre_s','DVD_Collection_Title'].some(field=>{
+        return (m[field] || '').toLowerCase().includes(searched);
+      });
+    });
+
+    filteredMovies = sortByTitle(filteredMovies);
+
+    if(!searched){
+      const recent = getRecentlyWatched();
+      if(recent.length){
+        content.appendChild(renderRow('Recently Watched', recent));
+      }
+      const recs = getRecommendations();
+      if(recs.length){
+        content.appendChild(renderRow('Recommended for You', recs));
+      }
+    }
+
+    const grouped = groupByGenre(filteredMovies);
+    Object.keys(grouped).sort().forEach(genre=>{
+      content.appendChild(renderRow(genre, grouped[genre]));
+    });
+
+    if(content.innerHTML === ''){
+      content.innerHTML = '<p>No movies match your search.</p>';
+    }
+  }
+
+  function setDarkMode(on){
+    console.log('Setting dark mode:', on);
+    if(on) document.body.classList.add('dark-mode');
+    else document.body.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', on ? '1' : '0');
+  }
+
+  darkModeToggle.addEventListener('change', e => {
+    setDarkMode(e.target.checked);
+  });
+
+  try {
+    console.log('Fetching CSV...');
+    const res = await fetch(CSV_URL);
+    if(!res.ok) throw new Error(`Failed to fetch CSV: ${res.status} ${res.statusText}`);
+    const text = await res.text();
+    console.log('CSV fetched, parsing...');
+    movies = normalizeKeys(csvToObjects(text));
+    console.log('Movies loaded:', movies.length);
+    renderAll();
+  } catch(e){
+    content.innerHTML = '<p>Failed to load your collection. Check your CSV URL and internet connection.</p>';
+    console.error('Error loading CSV or rendering:', e);
+  }
+
+  searchInput.addEventListener('input', () => {
+    console.log('Search input changed:', searchInput.value);
+    renderAll();
+  });
+
+  // Set dark mode on load from localStorage
+  setDarkMode(localStorage.getItem('darkMode') === '1');
+
 })();
 </script>
 
