@@ -284,11 +284,11 @@
   function groupByGenre(movieList) {
     let groups = {};
     movieList.forEach(m => {
-      if (!m.Genre_s) return;
-      m.Genre_s.split(',').map(g => g.trim()).forEach(genre => {
-        if (!groups[genre]) groups[genre] = [];
-        groups[genre].push(m);
-      });
+      if (!m['Genre(s)']) return;
+m['Genre(s)'].split(',').map(g => g.trim()).forEach(genre => {
+  if (!groups[genre]) groups[genre] = [];
+  groups[genre].push(m);
+});
     });
     return groups;
   }
