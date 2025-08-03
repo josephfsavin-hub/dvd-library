@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DVD Library</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      margin: 0;
       padding: 20px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1em;
+      margin-top: 20px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -20,121 +23,99 @@
       text-align: left;
     }
     th {
-      cursor: pointer;
+      background-color: #e9ecef;
+    }
+    img {
+      max-width: 100px;
     }
   </style>
 </head>
 <body>
   <h1>DVD Library</h1>
-  <table id="dvdTable">
-    <thead>
-      <tr id="tableHead"></tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-
-  <!-- PapaParse CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <div id="table-container">Loading...</div>
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv";
 
-    async function fetchAndParseCSV() {
-      console.log("Fetching CSV from:", CSV_URL);
+    async function fetchCSV(url) {
       try {
-        const response = await fetch(CSV_URL);
-        const csvText = await response.text();
+        console.log("Fetching CSV from:", url);
+        const response = await fetch(url);
+        const text = await response.text();
         console.log("CSV fetched successfully.");
-        const result = Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true
-        });
-
-        if (result.errors.length) {
-          console.warn("Errors during parsing:", result.errors);
-        }
-
-        let rows = result.data.filter(row => {
-          // Remove rows that are completely empty
-          return Object.values(row).some(value => value && value.trim() !== "");
-        });
-
-        console.log("Parsed rows:", rows);
-
-        normalizeAndRender(rows);
-      } catch (error) {
-        console.error("Failed to fetch or parse CSV:", error);
+        return text;
+      } catch (err) {
+        console.error("Error fetching CSV:", err);
+        return null;
       }
     }
 
-    function normalizeHeader(header) {
-      return header.trim().toLowerCase().replace(/\s+/g, "_");
-    }
-
-    function normalizeAndRender(rows) {
-      if (!rows.length) {
-        console.warn("No valid rows to display.");
-        return;
-      }
-
-      // Normalize headers using first row's keys
-      const originalHeaders = Object.keys(rows[0]);
-      const normalizedHeaders = originalHeaders.map(normalizeHeader);
-
-      console.log("Original headers:", originalHeaders);
+    function parseCSV(text) {
+      const rows = text.trim().split(/\r?\n/);
+      console.log("CSV Raw Rows:", rows);
+      const headers = rows[0].split(',').map(h => h.trim());
+      console.log("Original headers:", headers);
+      const normalizedHeaders = headers.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, '_'));
       console.log("Normalized headers:", normalizedHeaders);
 
-      // Build normalized row objects
-      const normalizedRows = rows.map(row => {
-        let normalized = {};
-        originalHeaders.forEach((origKey, index) => {
-          const normKey = normalizedHeaders[index];
-          normalized[normKey] = row[origKey]?.trim() || "";
+      const data = rows.slice(1).map(row => {
+        const values = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+        const obj = {};
+        values.forEach((val, i) => {
+          obj[normalizedHeaders[i]] = val.replace(/^"|"$/g, '');
         });
-        return normalized;
+        return obj;
       });
-
-      console.log("Normalized rows:", normalizedRows);
-
-      renderTable(normalizedHeaders, normalizedRows);
+      console.log("Normalized rows:", data);
+      return data;
     }
 
-    function renderTable(headers, rows) {
-      const tableHead = document.getElementById("tableHead");
-      const tableBody = document.getElementById("tableBody");
+    function renderTable(data) {
+      if (!data.length) return;
+      const container = document.getElementById("table-container");
+      const table = document.createElement("table");
 
-      // Clear any old content
-      tableHead.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      // Render headers
+      const headers = Object.keys(data[0]);
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
       headers.forEach(header => {
         const th = document.createElement("th");
-        th.textContent = header.replace(/_/g, " ");
-        th.addEventListener("click", () => {
-          console.log("Sorting by:", header);
-          rows.sort((a, b) => {
-            return (a[header] || "").localeCompare(b[header] || "", undefined, { sensitivity: 'base' });
-          });
-          renderTable(headers, rows); // re-render after sort
-        });
-        tableHead.appendChild(th);
+        th.textContent = header;
+        headerRow.appendChild(th);
       });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
 
-      // Render rows
-      rows.forEach(row => {
+      const tbody = document.createElement("tbody");
+      data.forEach(row => {
         const tr = document.createElement("tr");
         headers.forEach(header => {
           const td = document.createElement("td");
-          td.textContent = row[header] || "";
+          if (header === 'box_art_image_url' && row[header]) {
+            const img = document.createElement("img");
+            img.src = row[header];
+            td.appendChild(img);
+          } else {
+            td.textContent = row[header];
+          }
           tr.appendChild(td);
         });
-        tableBody.appendChild(tr);
+        tbody.appendChild(tr);
       });
+      table.appendChild(tbody);
+
+      container.innerHTML = "";
+      container.appendChild(table);
     }
 
-    // Kick it off
-    fetchAndParseCSV();
+    async function main() {
+      const csvText = await fetchCSV(CSV_URL);
+      if (!csvText) return;
+      const data = parseCSV(csvText);
+      renderTable(data);
+    }
+
+    main();
   </script>
 </body>
 </html>
