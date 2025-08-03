@@ -295,7 +295,7 @@
 
   // Get recently watched movies (watched=yes, sort by Last Watched desc)
   function getRecentlyWatched(n=5) {
-    return movies.filter(m => m.Watched_Yes_No.toLowerCase() === 'yes')
+return movies.filter(m => (m.Watched_Yes_No || '').toLowerCase() === 'yes')
       .sort((a,b) => {
         let da = new Date(a.Last_Watched || 0);
         let db = new Date(b.Last_Watched || 0);
