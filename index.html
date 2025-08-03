@@ -1,121 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DVD Library</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #e9ecef;
-    }
-    img {
-      max-width: 100px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DVD Library Dummy</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 1rem;
+    background: #fafafa;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+  }
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .movie-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .movie-card img {
+    max-width: 100%;
+    border-radius: 4px;
+  }
+  .movie-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+  }
+  .movie-genres {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  .movie-desc {
+    flex-grow: 1;
+    margin-bottom: 0.5rem;
+  }
+  .movie-info {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  .movie-links a {
+    margin-right: 1rem;
+    color: #06c;
+    text-decoration: none;
+  }
+  .movie-links a:hover {
+    text-decoration: underline;
+  }
+  .watch-btn {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  .watch-btn.watched {
+    background: #6c757d;
+  }
+  iframe {
+    width: 100%;
+    height: 180px;
+    border: none;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+</style>
 </head>
 <body>
-  <h1>DVD Library</h1>
-  <div id="table-container">Loading...</div>
+<h1>DVD Library - Dummy Data</h1>
 
-  <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv";
+<div class="movie-grid" id="movieGrid"></div>
 
-    async function fetchCSV(url) {
-      try {
-        console.log("Fetching CSV from:", url);
-        const response = await fetch(url);
-        const text = await response.text();
-        console.log("CSV fetched successfully.");
-        return text;
-      } catch (err) {
-        console.error("Error fetching CSV:", err);
-        return null;
+<script>
+  // Sample dummy movies data - 5 movies from your list with all info
+  const movies = [
+    {
+      title: "Zombieland",
+      alternate_title: "",
+      dvd_collection_title: "Zombie Collection",
+      type: "Movie",
+      genres: "Action, Comedy, Horror",
+      subgenre: "Zombie Comedy",
+      directors: "Ruben Fleischer",
+      writers: "Rhett Reese, Paul Wernick",
+      main_actors: "Woody Harrelson, Jesse Eisenberg, Emma Stone",
+      supporting_actors: "Abigail Breslin",
+      language: "English",
+      country: "USA",
+      year: "2009",
+      runtime_min: "88",
+      description: "A shy student trying to reach his family in Ohio, a gun-toting tough guy trying to find the last Twinkie, and a pair of sisters trying to get to an amusement park join forces to travel across a zombie-filled America.",
+      imdb_url: "https://www.imdb.com/title/tt1156398/",
+      youtube_trailer_url: "https://www.youtube.com/embed/9g8bDhdkbFQ",
+      watched: "Yes",
+      liked: "Yes",
+      priority: "High",
+      last_watched: "2023-08-01",
+      add_date: "2020-01-15",
+      shuffle_eligible: "Yes",
+      box_art_image_url: "https://m.media-amazon.com/images/I/51Dv6rUPvIL._AC_SY679_.jpg",
+      notes: ""
+    },
+    {
+      title: "Bridesmaids",
+      alternate_title: "",
+      dvd_collection_title: "Comedy Hits",
+      type: "Movie",
+      genres: "Comedy, Romance",
+      subgenre: "Romantic Comedy",
+      directors: "Paul Feig",
+      writers: "Annie Mumolo, Kristen Wiig",
+      main_actors: "Kristen Wiig, Maya Rudolph",
+      supporting_actors: "Rose Byrne",
+      language: "English",
+      country: "USA",
+      year: "2011",
+      runtime_min: "125",
+      description: "Competition between the maid of honor and a bridesmaid, over who is the bride's best friend, threatens to upend the life of an out-of-work pastry chef.",
+      imdb_url: "https://www.imdb.com/title/tt1478338/",
+      youtube_trailer_url: "https://www.youtube.com/embed/FGYz0e0eb8U",
+      watched: "No",
+      liked: "No",
+      priority: "Medium",
+      last_watched: "",
+      add_date: "2019-07-10",
+      shuffle_eligible: "No",
+      box_art_image_url: "https://m.media-amazon.com/images/I/81HPF8FnnsL._AC_SY679_.jpg",
+      notes: "Try watching with friends"
+    },
+    {
+      title: "The Godfather",
+      alternate_title: "",
+      dvd_collection_title: "Classic Mafia",
+      type: "Movie",
+      genres: "Crime, Drama",
+      subgenre: "Mafia",
+      directors: "Francis Ford Coppola",
+      writers: "Mario Puzo, Francis Ford Coppola",
+      main_actors: "Marlon Brando, Al Pacino",
+      supporting_actors: "James Caan",
+      language: "English, Italian",
+      country: "USA",
+      year: "1972",
+      runtime_min: "175",
+      description: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+      imdb_url: "https://www.imdb.com/title/tt0068646/",
+      youtube_trailer_url: "https://www.youtube.com/embed/sY1S34973zA",
+      watched: "Yes",
+      liked: "Yes",
+      priority: "High",
+      last_watched: "2022-12-25",
+      add_date: "2018-03-12",
+      shuffle_eligible: "Yes",
+      box_art_image_url: "https://m.media-amazon.com/images/I/41+eK8zBwQL._AC_SY679_.jpg",
+      notes: "Must watch again"
+    },
+    {
+      title: "Click",
+      alternate_title: "",
+      dvd_collection_title: "Adam Sandler Collection",
+      type: "Movie",
+      genres: "Comedy, Drama, Fantasy",
+      subgenre: "",
+      directors: "Frank Coraci",
+      writers: "Steve Koren, Mark O'Keefe",
+      main_actors: "Adam Sandler, Kate Beckinsale",
+      supporting_actors: "Christopher Walken",
+      language: "English",
+      country: "USA",
+      year: "2006",
+      runtime_min: "107",
+      description: "A workaholic architect finds a universal remote that allows him to fast-forward and rewind to different parts of his life, but when he tries to pause it, things go wrong.",
+      imdb_url: "https://www.imdb.com/title/tt0389860/",
+      youtube_trailer_url: "https://www.youtube.com/embed/mtNCcYVxjwQ",
+      watched: "No",
+      liked: "No",
+      priority: "Low",
+      last_watched: "",
+      add_date: "2019-01-05",
+      shuffle_eligible: "No",
+      box_art_image_url: "https://m.media-amazon.com/images/I/51E4tMxLK9L._AC_SY679_.jpg",
+      notes: ""
+    },
+    {
+      title: "Boy",
+      alternate_title: "",
+      dvd_collection_title: "NZ Hits",
+      type: "Movie",
+      genres: "Comedy, Drama",
+      subgenre: "",
+      directors: "Taika Waititi",
+      writers: "Taika Waititi",
+      main_actors: "James Rolleston, Taika Waititi",
+      supporting_actors: "Te Aho Eketone-Whitu",
+      language: "English, Maori",
+      country: "New Zealand",
+      year: "2010",
+      runtime_min: "87",
+      description: "A boy in rural New Zealand tries to find his missing father while dealing with the struggles of growing up.",
+      imdb_url: "https://www.imdb.com/title/tt1174732/",
+      youtube_trailer_url: "https://www.youtube.com/embed/2avHnlWv9Zc",
+      watched: "Yes",
+      liked: "Yes",
+      priority: "Medium",
+      last_watched: "2023-05-18",
+      add_date: "2021-06-20",
+      shuffle_eligible: "Yes",
+      box_art_image_url: "https://m.media-amazon.com/images/I/81u29jGb1nL._AC_SY679_.jpg",
+      notes: ""
+    }
+  ];
+
+  const movieGrid = document.getElementById("movieGrid");
+
+  function createMovieCard(movie) {
+    console.log("Rendering movie:", movie.title);
+
+    const card = document.createElement("div");
+    card.className = "movie-card";
+
+    const img = document.createElement("img");
+    img.src = movie.box_art_image_url || "";
+    img.alt = movie.title + " Box Art";
+    card.appendChild(img);
+
+    const title = document.createElement("div");
+    title.className = "movie-title";
+    title.textContent = movie.title;
+    card.appendChild(title);
+
+    const genres = document.createElement("div");
+    genres.className = "movie-genres";
+    genres.textContent = movie.genres || "No genres";
+    card.appendChild(genres);
+
+    const description = document.createElement("div");
+    description.className = "movie-desc";
+    description.textContent = movie.description || "No description available.";
+    card.appendChild(description);
+
+    const info = document.createElement("div");
+    info.className = "movie-info";
+    info.innerHTML = `
+      <strong>Director(s):</strong> ${movie.directors || "N/A"}<br />
+      <strong>Year:</strong> ${movie.year || "N/A"}<br />
+      <strong>Runtime:</strong> ${movie.runtime_min || "N/A"} minutes<br />
+      <strong>Language(s):</strong> ${movie.language || "N/A"}<br />
+      <strong>Country:</strong> ${movie.country || "N/A"}<br />
+      <strong>Watched:</strong> ${movie.watched || "No"}<br />
+      <strong>Priority:</strong> ${movie.priority || "N/A"}<br />
+      <strong>Notes:</strong> ${movie.notes || "None"}
+    `;
+    card.appendChild(info);
+
+    const links = document.createElement("div");
+    links.className = "movie-links";
+    links.innerHTML = `
+      <a href="${movie.imdb_url}" target="_blank" rel="noopener noreferrer">IMDb</a>
+      <a href="${movie.youtube_trailer_url}" target="_blank" rel="noopener noreferrer">Trailer (new tab)</a>
+    `;
+    card.appendChild(links);
+
+        if (movie.youtube_trailer_url) {
+      const iframe = document.createElement("iframe");
+      iframe.src = movie.youtube_trailer_url;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      card.appendChild(iframe);
+    }
+
+    // Watch toggle button
+    const watchBtn = document.createElement("button");
+    watchBtn.className = "watch-btn";
+    watchBtn.textContent = movie.watched && movie.watched.toLowerCase() === "yes" ? "Watched ✓" : "Mark as Watched";
+    if (movie.watched && movie.watched.toLowerCase() === "yes") {
+      watchBtn.classList.add("watched");
+    }
+    watchBtn.addEventListener("click", () => {
+      if (watchBtn.classList.contains("watched")) {
+        watchBtn.classList.remove("watched");
+        watchBtn.textContent = "Mark as Watched";
+      } else {
+        watchBtn.classList.add("watched");
+        watchBtn.textContent = "Watched ✓";
       }
-    }
+    });
+    card.appendChild(watchBtn);
 
-    function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/);
-      console.log("CSV Raw Rows:", rows);
-      const headers = rows[0].split(',').map(h => h.trim());
-      console.log("Original headers:", headers);
-      const normalizedHeaders = headers.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, '_'));
-      console.log("Normalized headers:", normalizedHeaders);
+    return card;
+  }
 
-      const data = rows.slice(1).map(row => {
-        const values = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-        const obj = {};
-        values.forEach((val, i) => {
-          obj[normalizedHeaders[i]] = val.replace(/^"|"$/g, '');
-        });
-        return obj;
-      });
-      console.log("Normalized rows:", data);
-      return data;
-    }
+  function renderMovies() {
+    movieGrid.innerHTML = "";
+    movies.forEach(movie => {
+      const card = createMovieCard(movie);
+      movieGrid.appendChild(card);
+    });
+  }
 
-    function renderTable(data) {
-      if (!data.length) return;
-      const container = document.getElementById("table-container");
-      const table = document.createElement("table");
-
-      const headers = Object.keys(data[0]);
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
-      headers.forEach(header => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-
-      const tbody = document.createElement("tbody");
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        headers.forEach(header => {
-          const td = document.createElement("td");
-          if (header === 'box_art_image_url' && row[header]) {
-            const img = document.createElement("img");
-            img.src = row[header];
-            td.appendChild(img);
-          } else {
-            td.textContent = row[header];
-          }
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-
-      container.innerHTML = "";
-      container.appendChild(table);
-    }
-
-    async function main() {
-      const csvText = await fetchCSV(CSV_URL);
-      if (!csvText) return;
-      const data = parseCSV(csvText);
-      renderTable(data);
-    }
-
-    main();
-  </script>
+  renderMovies();
+</script>
 </body>
 </html>
