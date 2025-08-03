@@ -518,6 +518,8 @@
   // Main init
   try {
     movies = await fetchMovies();
+    console.log("Fetched CSV text:", await fetchMovies());
+
 
     // Normalize keys to safe JS property names by replacing spaces and parentheses with underscores
     movies = movies.map(m => {
