@@ -294,15 +294,26 @@ m['Genre(s)'].split(',').map(g => g.trim()).forEach(genre => {
   }
 
   // Get recently watched movies (watched=yes, sort by Last Watched desc)
-  function getRecentlyWatched(n=5) {
-return movies.filter(m => (m.Watched_Yes_No || '').toLowerCase() === 'yes')
-      .sort((a,b) => {
-        let da = new Date(a.Last_Watched || 0);
-        let db = new Date(b.Last_Watched || 0);
-        return db - da;
-      })
-      .slice(0,n);
-  }
+function getRecentlyWatched(n=5) {
+  return movies.filter(m => {
+    if (!m || !m.Watched_Yes_No) {
+      console.warn('Missing Watched_Yes_No:', m);
+      return false;
+    }
+    // Safe check for Watched_Yes_No
+    if ((m.Watched_Yes_No || '').toLowerCase() !== 'yes') return false;
+
+    // Add any other .toLowerCase() property checks here if you have them in filter
+    
+    return true;
+  })
+  .sort((a,b) => {
+    let da = new Date(a.Last_Watched || 0);
+    let db = new Date(b.Last_Watched || 0);
+    return db - da;
+  })
+  .slice(0,n);
+}
 
   // Recommend movies based on genres, directors, actors in recent watches
   function getRecommendations() {
