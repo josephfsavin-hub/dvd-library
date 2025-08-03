@@ -3,316 +3,415 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DVD Library Dummy</title>
+<title>My Netflix Style Movie Library</title>
 <style>
+  /* RESET */
+  * {
+    box-sizing: border-box;
+  }
   body {
-    font-family: Arial, sans-serif;
-    margin: 1rem;
-    background: #fafafa;
-    color: #333;
+    margin: 0;
+    background-color: #141414;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
   }
-  h1 {
-    text-align: center;
+  header {
+    background-color: #111;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 999;
   }
-  .movie-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-    gap: 1rem;
-    margin-top: 2rem;
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #e50914; /* Netflix red */
+  }
+  #searchInput {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+    width: 250px;
+    max-width: 60vw;
+  }
+  #content {
+    padding: 1rem 2rem 4rem;
+  }
+  .genre-section {
+    margin-bottom: 3rem;
+  }
+  .genre-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    padding-left: 0.25rem;
+  }
+  .movie-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+  }
+  .movie-row::-webkit-scrollbar {
+    height: 8px;
+  }
+  .movie-row::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 10px;
   }
   .movie-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    min-width: 140px;
+    max-width: 140px;
+    cursor: pointer;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.8);
+    transition: transform 0.2s ease;
   }
-  .movie-card img {
-    max-width: 100%;
-    border-radius: 4px;
+  .movie-card:hover {
+    transform: scale(1.12);
+    z-index: 2;
+  }
+  .movie-poster {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
   }
   .movie-title {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0.4rem 0 0.2rem 0;
+    padding: 0 0.25rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
-  .movie-genres {
-    font-style: italic;
-    color: #666;
-    margin-bottom: 0.5rem;
-  }
-  .movie-desc {
-    flex-grow: 1;
-    margin-bottom: 0.5rem;
-  }
-  .movie-info {
-    font-size: 0.85rem;
-    margin-bottom: 0.25rem;
-  }
-  .movie-links a {
-    margin-right: 1rem;
-    color: #06c;
-    text-decoration: none;
-  }
-  .movie-links a:hover {
-    text-decoration: underline;
-  }
-  .watch-btn {
-    padding: 0.4rem 0.8rem;
-    border: none;
-    border-radius: 4px;
-    background: #28a745;
-    color: white;
-    cursor: pointer;
-    align-self: flex-start;
-  }
-  .watch-btn.watched {
-    background: #6c757d;
-  }
-  iframe {
+  /* Modal styles */
+  #modal {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 180px;
+    height: 100%;
+    background-color: rgba(20,20,20,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+  #modal.active {
+    display: flex;
+  }
+  #modal-content {
+    background-color: #222;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    border-radius: 8px;
+    overflow-y: auto;
+    box-shadow: 0 0 15px #e50914aa;
+    padding: 1rem 1.5rem 2rem;
+    color: #eee;
+    position: relative;
+  }
+  #modal-close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #e50914;
+  }
+  #modal-content h2 {
+    margin-top: 0;
+  }
+  #modal-poster {
+    float: left;
+    width: 140px;
+    border-radius: 5px;
+    margin-right: 1rem;
+    box-shadow: 0 0 10px #e50914bb;
+  }
+  #modal-details {
+    overflow: hidden;
+  }
+  #modal-description {
+    margin-top: 1rem;
+    line-height: 1.4;
+  }
+  #modal-trailer {
+    margin-top: 1.5rem;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     border: none;
     border-radius: 6px;
-    margin-top: 0.5rem;
+    box-shadow: 0 0 10px #e50914bb;
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    #modal-content {
+      max-width: 100%;
+      padding: 1rem;
+    }
+    #modal-poster {
+      float: none;
+      display: block;
+      margin: 0 auto 1rem;
+      width: 80vw;
+      max-width: 300px;
+    }
   }
 </style>
 </head>
 <body>
-<h1>DVD Library - Dummy Data</h1>
+<header>
+  <h1>My Movie Library</h1>
+  <input type="search" id="searchInput" placeholder="Search movies..." />
+</header>
+<main id="content">
+  <!-- Genre sections will be inserted here dynamically -->
+</main>
 
-<div class="movie-grid" id="movieGrid"></div>
+<!-- Modal for movie details -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div id="modal-content">
+    <span id="modal-close" title="Close modal">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <div id="modal-details">
+      <img id="modal-poster" src="" alt="Movie Poster" />
+      <p><strong>Year:</strong> <span id="modal-year"></span></p>
+      <p><strong>Genres:</strong> <span id="modal-genres"></span></p>
+      <p><strong>Description:</strong></p>
+      <p id="modal-description"></p>
+      <iframe
+        id="modal-trailer"
+        src=""
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        title="Movie Trailer"
+      ></iframe>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Sample dummy movies data - 5 movies from your list with all info
+  // Sample movie data (10 movies)
   const movies = [
     {
-      title: "Zombieland",
-      alternate_title: "",
-      dvd_collection_title: "Zombie Collection",
-      type: "Movie",
-      genres: "Action, Comedy, Horror",
-      subgenre: "Zombie Comedy",
-      directors: "Ruben Fleischer",
-      writers: "Rhett Reese, Paul Wernick",
-      main_actors: "Woody Harrelson, Jesse Eisenberg, Emma Stone",
-      supporting_actors: "Abigail Breslin",
-      language: "English",
-      country: "USA",
-      year: "2009",
-      runtime_min: "88",
-      description: "A shy student trying to reach his family in Ohio, a gun-toting tough guy trying to find the last Twinkie, and a pair of sisters trying to get to an amusement park join forces to travel across a zombie-filled America.",
-      imdb_url: "https://www.imdb.com/title/tt1156398/",
-      youtube_trailer_url: "https://www.youtube.com/embed/9g8bDhdkbFQ",
-      watched: "Yes",
-      liked: "Yes",
-      priority: "High",
-      last_watched: "2023-08-01",
-      add_date: "2020-01-15",
-      shuffle_eligible: "Yes",
-      box_art_image_url: "https://m.media-amazon.com/images/I/51Dv6rUPvIL._AC_SY679_.jpg",
-      notes: ""
-    },
-    {
-      title: "Bridesmaids",
-      alternate_title: "",
-      dvd_collection_title: "Comedy Hits",
-      type: "Movie",
-      genres: "Comedy, Romance",
-      subgenre: "Romantic Comedy",
-      directors: "Paul Feig",
-      writers: "Annie Mumolo, Kristen Wiig",
-      main_actors: "Kristen Wiig, Maya Rudolph",
-      supporting_actors: "Rose Byrne",
-      language: "English",
-      country: "USA",
-      year: "2011",
-      runtime_min: "125",
-      description: "Competition between the maid of honor and a bridesmaid, over who is the bride's best friend, threatens to upend the life of an out-of-work pastry chef.",
-      imdb_url: "https://www.imdb.com/title/tt1478338/",
-      youtube_trailer_url: "https://www.youtube.com/embed/FGYz0e0eb8U",
-      watched: "No",
-      liked: "No",
-      priority: "Medium",
-      last_watched: "",
-      add_date: "2019-07-10",
-      shuffle_eligible: "No",
-      box_art_image_url: "https://m.media-amazon.com/images/I/81HPF8FnnsL._AC_SY679_.jpg",
-      notes: "Try watching with friends"
+      title: "Inception",
+      genres: ["Action", "Sci-Fi", "Thriller"],
+      year: 2010,
+      description: "A thief who steals corporate secrets through the use of dream-sharing technology...",
+      poster: "https://image.tmdb.org/t/p/w300/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
+      trailer: "https://www.youtube.com/embed/8hP9D6kZseM"
     },
     {
       title: "The Godfather",
-      alternate_title: "",
-      dvd_collection_title: "Classic Mafia",
-      type: "Movie",
-      genres: "Crime, Drama",
-      subgenre: "Mafia",
-      directors: "Francis Ford Coppola",
-      writers: "Mario Puzo, Francis Ford Coppola",
-      main_actors: "Marlon Brando, Al Pacino",
-      supporting_actors: "James Caan",
-      language: "English, Italian",
-      country: "USA",
-      year: "1972",
-      runtime_min: "175",
+      genres: ["Crime", "Drama"],
+      year: 1972,
       description: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
-      imdb_url: "https://www.imdb.com/title/tt0068646/",
-      youtube_trailer_url: "https://www.youtube.com/embed/sY1S34973zA",
-      watched: "Yes",
-      liked: "Yes",
-      priority: "High",
-      last_watched: "2022-12-25",
-      add_date: "2018-03-12",
-      shuffle_eligible: "Yes",
-      box_art_image_url: "https://m.media-amazon.com/images/I/41+eK8zBwQL._AC_SY679_.jpg",
-      notes: "Must watch again"
+      poster: "https://image.tmdb.org/t/p/w300/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+      trailer: "https://www.youtube.com/embed/sY1S34973zA"
     },
     {
-      title: "Click",
-      alternate_title: "",
-      dvd_collection_title: "Adam Sandler Collection",
-      type: "Movie",
-      genres: "Comedy, Drama, Fantasy",
-      subgenre: "",
-      directors: "Frank Coraci",
-      writers: "Steve Koren, Mark O'Keefe",
-      main_actors: "Adam Sandler, Kate Beckinsale",
-      supporting_actors: "Christopher Walken",
-      language: "English",
-      country: "USA",
-      year: "2006",
-      runtime_min: "107",
-      description: "A workaholic architect finds a universal remote that allows him to fast-forward and rewind to different parts of his life, but when he tries to pause it, things go wrong.",
-      imdb_url: "https://www.imdb.com/title/tt0389860/",
-      youtube_trailer_url: "https://www.youtube.com/embed/mtNCcYVxjwQ",
-      watched: "No",
-      liked: "No",
-      priority: "Low",
-      last_watched: "",
-      add_date: "2019-01-05",
-      shuffle_eligible: "No",
-      box_art_image_url: "https://m.media-amazon.com/images/I/51E4tMxLK9L._AC_SY679_.jpg",
-      notes: ""
+      title: "Pulp Fiction",
+      genres: ["Crime", "Drama"],
+      year: 1994,
+      description: "The lives of two mob hitmen, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+      poster: "https://image.tmdb.org/t/p/w300/dM2w364MScsjFf8pfMbaWUcWrR.jpg",
+      trailer: "https://www.youtube.com/embed/s7EdQ4FqbhY"
     },
     {
-      title: "Boy",
-      alternate_title: "",
-      dvd_collection_title: "NZ Hits",
-      type: "Movie",
-      genres: "Comedy, Drama",
-      subgenre: "",
-      directors: "Taika Waititi",
-      writers: "Taika Waititi",
-      main_actors: "James Rolleston, Taika Waititi",
-      supporting_actors: "Te Aho Eketone-Whitu",
-      language: "English, Maori",
-      country: "New Zealand",
-      year: "2010",
-      runtime_min: "87",
-      description: "A boy in rural New Zealand tries to find his missing father while dealing with the struggles of growing up.",
-      imdb_url: "https://www.imdb.com/title/tt1174732/",
-      youtube_trailer_url: "https://www.youtube.com/embed/2avHnlWv9Zc",
-      watched: "Yes",
-      liked: "Yes",
-      priority: "Medium",
-      last_watched: "2023-05-18",
-      add_date: "2021-06-20",
-      shuffle_eligible: "Yes",
-      box_art_image_url: "https://m.media-amazon.com/images/I/81u29jGb1nL._AC_SY679_.jpg",
-      notes: ""
+      title: "The Dark Knight",
+      genres: ["Action", "Crime", "Drama"],
+      year: 2008,
+      description: "When the menace known as the Joker wreaks havoc and chaos on Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
+      poster: "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+      trailer: "https://www.youtube.com/embed/EXeTwQWrcwY"
+    },
+    {
+      title: "Forrest Gump",
+      genres: ["Drama", "Romance"],
+      year: 1994,
+      description: "The presidencies of Kennedy and Johnson, Vietnam, Watergate, and other history unfold through the perspective of an Alabama man with an IQ of 75.",
+      poster: "https://image.tmdb.org/t/p/w300/saHP97rTPS5eLmrLQEcANmKrsFl.jpg",
+      trailer: "https://www.youtube.com/embed/bLvqoHBptjg"
+    },
+    {
+      title: "Fight Club",
+      genres: ["Drama"],
+      year: 1999,
+      description: "An insomniac office worker and a devil-may-care soap maker form an underground fight club.",
+      poster: "https://image.tmdb.org/t/p/w300/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg",
+      trailer: "https://www.youtube.com/embed/SUXWAEX2jlg"
+    },
+    {
+      title: "Interstellar",
+      genres: ["Adventure", "Drama", "Sci-Fi"],
+      year: 2014,
+      description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+      poster: "https://image.tmdb.org/t/p/w300/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+      trailer: "https://www.youtube.com/embed/zSWdZVtXT7E"
+    },
+    {
+      title: "The Matrix",
+      genres: ["Action", "Sci-Fi"],
+      year: 1999,
+      description: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+      poster: "https://image.tmdb.org/t/p/w300/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+      trailer: "https://www.youtube.com/embed/vKQi3bBA1y8"
+    },
+    {
+      title: "Gladiator",
+      genres: ["Action", "Adventure", "Drama"],
+      year: 2000,
+      description: "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family.",
+      poster: "https://image.tmdb.org/t/p/w300/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg",
+      trailer: "https://www.youtube.com/embed/owK1qxDselE"
+    },
+    {
+      title: "The Shawshank Redemption",
+      genres: ["Drama", "Crime"],
+      year: 1994,
+      description: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+      poster: "https://image.tmdb.org/t/p/w300/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+      trailer: "https://www.youtube.com/embed/6hB3S9bIaco"
     }
   ];
 
-  const movieGrid = document.getElementById("movieGrid");
+  const contentEl = document.getElementById('content');
+  const searchInput = document.getElementById('searchInput');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalPoster = document.getElementById('modal-poster');
+  const modalYear = document.getElementById('modal-year');
+  const modalGenres = document.getElementById('modal-genres');
+  const modalDescription = document.getElementById('modal-description');
+  const modalTrailer = document.getElementById('modal-trailer');
+  const modalClose = document.getElementById('modal-close');
 
-  function createMovieCard(movie) {
-    console.log("Rendering movie:", movie.title);
-
-    const card = document.createElement("div");
-    card.className = "movie-card";
-
-    const img = document.createElement("img");
-    img.src = movie.box_art_image_url || "";
-    img.alt = movie.title + " Box Art";
-    card.appendChild(img);
-
-    const title = document.createElement("div");
-    title.className = "movie-title";
-    title.textContent = movie.title;
-    card.appendChild(title);
-
-    const genres = document.createElement("div");
-    genres.className = "movie-genres";
-    genres.textContent = movie.genres || "No genres";
-    card.appendChild(genres);
-
-    const description = document.createElement("div");
-    description.className = "movie-desc";
-    description.textContent = movie.description || "No description available.";
-    card.appendChild(description);
-
-    const info = document.createElement("div");
-    info.className = "movie-info";
-    info.innerHTML = `
-      <strong>Director(s):</strong> ${movie.directors || "N/A"}<br />
-      <strong>Year:</strong> ${movie.year || "N/A"}<br />
-      <strong>Runtime:</strong> ${movie.runtime_min || "N/A"} minutes<br />
-      <strong>Language(s):</strong> ${movie.language || "N/A"}<br />
-      <strong>Country:</strong> ${movie.country || "N/A"}<br />
-      <strong>Watched:</strong> ${movie.watched || "No"}<br />
-      <strong>Priority:</strong> ${movie.priority || "N/A"}<br />
-      <strong>Notes:</strong> ${movie.notes || "None"}
-    `;
-    card.appendChild(info);
-
-    const links = document.createElement("div");
-    links.className = "movie-links";
-    links.innerHTML = `
-      <a href="${movie.imdb_url}" target="_blank" rel="noopener noreferrer">IMDb</a>
-      <a href="${movie.youtube_trailer_url}" target="_blank" rel="noopener noreferrer">Trailer (new tab)</a>
-    `;
-    card.appendChild(links);
-
-        if (movie.youtube_trailer_url) {
-      const iframe = document.createElement("iframe");
-      iframe.src = movie.youtube_trailer_url;
-      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      iframe.allowFullscreen = true;
-      card.appendChild(iframe);
-    }
-
-    // Watch toggle button
-    const watchBtn = document.createElement("button");
-    watchBtn.className = "watch-btn";
-    watchBtn.textContent = movie.watched && movie.watched.toLowerCase() === "yes" ? "Watched ✓" : "Mark as Watched";
-    if (movie.watched && movie.watched.toLowerCase() === "yes") {
-      watchBtn.classList.add("watched");
-    }
-    watchBtn.addEventListener("click", () => {
-      if (watchBtn.classList.contains("watched")) {
-        watchBtn.classList.remove("watched");
-        watchBtn.textContent = "Mark as Watched";
-      } else {
-        watchBtn.classList.add("watched");
-        watchBtn.textContent = "Watched ✓";
-      }
-    });
-    card.appendChild(watchBtn);
-
-    return card;
-  }
-
-  function renderMovies() {
-    movieGrid.innerHTML = "";
+  // Group movies by genre
+  function groupByGenre(movies) {
+    const genreMap = {};
     movies.forEach(movie => {
-      const card = createMovieCard(movie);
-      movieGrid.appendChild(card);
+      movie.genres.forEach(g => {
+        if (!genreMap[g]) genreMap[g] = [];
+        genreMap[g].push(movie);
+      });
+    });
+    return genreMap;
+  }
+
+  // Render all movies grouped by genre
+  function renderMovies(movies) {
+    contentEl.innerHTML = '';
+    const grouped = groupByGenre(movies);
+    if (movies.length === 0) {
+      contentEl.innerHTML = '<p style="padding:1rem; font-size:1.2rem;">No movies found.</p>';
+      return;
+    }
+    Object.entries(grouped).forEach(([genre, movies]) => {
+      const section = document.createElement('section');
+      section.classList.add('genre-section');
+
+      const title = document.createElement('h2');
+      title.className = 'genre-title';
+      title.textContent = genre;
+      section.appendChild(title);
+
+      const row = document.createElement('div');
+      row.className = 'movie-row';
+
+      movies.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.setAttribute('tabindex', 0);
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-pressed', 'false');
+
+        card.addEventListener('click', () => showModal(movie));
+        card.addEventListener('keypress', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showModal(movie);
+          }
+        });
+
+        const img = document.createElement('img');
+        img.className = 'movie-poster';
+        img.src = movie.poster;
+        img.alt = `Poster of ${movie.title}`;
+
+        const titleEl = document.createElement('p');
+        titleEl.className = 'movie-title';
+        titleEl.textContent = movie.title;
+
+        card.appendChild(img);
+        card.appendChild(titleEl);
+        row.appendChild(card);
+      });
+
+      section.appendChild(row);
+      contentEl.appendChild(section);
     });
   }
 
-  renderMovies();
+  // Show modal with movie details
+  function showModal(movie) {
+    modalTitle.textContent = movie.title;
+    modalPoster.src = movie.poster;
+    modalPoster.alt = `Poster of ${movie.title}`;
+    modalYear.textContent = movie.year;
+    modalGenres.textContent = movie.genres.join(', ');
+    modalDescription.textContent = movie.description;
+    modalTrailer.src = movie.trailer + "?autoplay=1&rel=0";
+
+    modal.classList.add('active');
+    modalClose.focus();
+  }
+
+  // Close modal and stop trailer
+  function closeModal() {
+    modal.classList.remove('active');
+    modalTrailer.src = "";
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Search functionality
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    if (!query) {
+      renderMovies(movies);
+      return;
+    }
+    const filtered = movies.filter(m => m.title.toLowerCase().includes(query) ||
+      m.genres.some(g => g.toLowerCase().includes(query)) ||
+      m.description.toLowerCase().includes(query));
+    renderMovies(filtered);
+  });
+
+  // Initial render
+  renderMovies(movies);
 </script>
 </body>
 </html>
