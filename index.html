@@ -70,7 +70,7 @@
     const collection = new MovieCollection();
 
     // Put your actual published Google Sheets CSV link here
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=1112603969&single=true&output=csv';
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pubhtml?gid=1112603969&amp;single=true&amp;widget=true&amp;headers=false';
 
     collection.loadFromGoogleSheetCSV(csvUrl).then(() => {
       const forYou = document.getElementById('foryou-grid');
