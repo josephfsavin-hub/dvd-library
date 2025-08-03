@@ -236,7 +236,7 @@
 
   // Fetch CSV from Google Sheet
   async function fetchMovies() {
-    const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pubhtml?widget=true&amp;headers=false');
+    const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQp02iy9X1EC_W7jm12Ph3G9Z28WS1ndYJr6D-MS3CfeIBPkQiFbD9ZZj_mfOHxkZXFKEQNdmQoIhG3/pub?gid=0&single=true&output=csv');
     const text = await res.text();
     return csvToObjects(text);
   }
