@@ -14,29 +14,34 @@
 
     .carousel {
       display: flex;
-      justify-content: space-around;
       gap: 20px;
-      flex-wrap: wrap;
+      overflow-x: auto;
+      padding-bottom: 10px;
     }
 
     .card {
+      flex: 0 0 auto;
+      width: 220px;
       position: relative;
-      width: 250px;
-      overflow: hidden;
       transition: transform 0.3s ease;
       cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+      z-index: 10;
     }
 
     .card img {
       width: 100%;
       height: auto;
       display: block;
-      transition: transform 0.3s ease, filter 0.3s ease;
+      transition: filter 0.3s ease;
     }
 
     .title {
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1.1em;
       margin-top: 10px;
       transition: color 0.3s ease;
     }
@@ -47,20 +52,31 @@
       left: 0;
       width: 100%;
       height: 100%;
-      color: white;
+      padding: 15px;
+      box-sizing: border-box;
       background: rgba(0, 0, 0, 0.6);
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 20px;
       opacity: 0;
       transition: opacity 0.3s ease;
-      font-size: 1em;
+      pointer-events: none;
+    }
+
+    .overlay p {
+      margin: 0 0 10px;
+      font-size: 0.95em;
+      line-height: 1.3em;
+    }
+
+    .year {
+      font-size: 0.85em;
+      color: #aaa;
     }
 
     .card:hover img {
-      transform: scale(1.1);
       filter: blur(4px);
     }
 
@@ -71,29 +87,48 @@
     .card:hover .title {
       color: #0ff;
     }
+
+    /* Scrollbar style (optional) */
+    .carousel::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .carousel::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
 
   <div class="carousel">
     <!-- Movie 1 -->
-    <div class="card" onclick="">
+    <div class="card">
       <img src="https://upload.wikimedia.org/wikipedia/en/3/33/Taxi_Driver_%281976_film_poster%29.jpg" alt="Taxi Driver">
-      <div class="overlay">A young disgruntled taxi driver takes cleaning the streets into his own hands.</div>
+      <div class="overlay">
+        <p>A young disgruntled taxi driver takes cleaning the streets into his own hands.</p>
+        <div class="year">1976</div>
+      </div>
       <div class="title">TAXI DRIVER</div>
     </div>
 
     <!-- Movie 2 -->
     <div class="card">
       <img src="https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png" alt="Titanic">
-      <div class="overlay">Classic lady and the tramp type shi</div>
+      <div class="overlay">
+        <p>Classic lady and the tramp type shi</p>
+        <div class="year">1997</div>
+      </div>
       <div class="title">TITANIC</div>
     </div>
 
     <!-- Movie 3 -->
     <div class="card">
       <img src="https://m.media-amazon.com/images/I/81AjFG4QWTL._UF894,1000_QL80_.jpg" alt="Shrek the Third">
-      <div class="overlay">He's baaaaaaack! Your favorite swamp monster is back... again! OMG it's shrek!!</div>
+      <div class="overlay">
+        <p>He's baaaaaaack! Your favorite swamp monster is back... again! OMG it's shrek!!</p>
+        <div class="year">2007</div>
+      </div>
       <div class="title">SHREK THE THIRD</div>
     </div>
   </div>
